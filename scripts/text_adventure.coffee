@@ -28,3 +28,32 @@ module.exports = (robot) ->
     monster_name = new assembler.GenAssembler(monster.GetAVocab())
     monster_desc_text = new assembler.GenAssembler(monster_desc.GetAVocab())
     msg.send monster_name.Generate() + " - " + monster_desc_text.Generate()
+
+  robot.respond /((W|w)ant (T|t)o (P|p)lay (A|a) (G|g)ame)/i, (msg) ->
+    user = ''
+    for own key, user of robot.brain.data.users
+      msg.send "#{user.id} #{user.name}"
+      user = "#{user.id}"
+
+    previous_game = robot.brain.get('dungeon_data')
+    payload = {}
+    if previous_game === undefined
+      payload = start_game
+      msg.send "New Game Started"
+    else
+      payload = previous_game['storage']
+      msg.send "Resume Previous Game? Y/N"
+      robot.respond /((Y|y)/i, (msg) ->
+        payload = start_game
+
+
+
+
+        start_game = () ->
+          payload = {}
+          payload['player_'+user] = {status: "started"}
+          payload
+
+
+
+
